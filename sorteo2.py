@@ -1,84 +1,28 @@
 import streamlit as st
-import random
-import pandas as pd
 import json
-import os
 
-# ===============================
-# FUNCIÓN DE EMPAREJAMIENTO
-# ===============================
-def generar_parejas(participantes):
-    asignados = participantes.copy()
-    while True:
-        random.shuffle(asignados)
-        if all(p != a for p, a in zip(participantes, asignados)):
-            return dict(zip(participantes, asignados))
+st.set_page_config(page_title="Sorteo Secreto", layout="centered")
 
-# ===============================
-# CARGAR O CREAR PAREJAS
-# ===============================
-def cargar_parejas():
-    if os.path.exists("parejas.json"):
-        with open("parejas.json", "r") as f:
-            return json.load(f)
-    return None
+st.title("🎁 Sorteo Secreto")
+st.write("Ingresa tu nombre para ver tu participante asignado.")
 
-def guardar_parejas(parejas):
-    with open("parejas.json", "w") as f:
-        json.dump(parejas, f)
+# Cargar sorteo.json desde GitHub (incluido en el repo)
+with open("sorteo.json", "r") as f:
+    sorteo = json.load(f)
 
-# ===============================
-# CONFIGURACIÓN
-# ===============================
-st.set_page_config(page_title="Sorteo Secreto", page_icon="🎁")
+nombre = st.text_input("Tu nombre:")
 
-st.title("🎁 Sorteo Secreto – Amigo Secreto")
+if nombre:
+    nombre = nombre.strip().title()
 
-
-# PARTICIPANTES POR DEFECTO
-lista_defecto = [
-    "Ariana", "Adrian", "Celena", "Javi", "Fabricio",
-    "Theo", "Manuel", "Ivonne", "Gustavo", "Isaac", "Fernando"
-]
-
-# Cargar participantes en sesión
-if "participantes" not in st.session_state:
-    st.session_state.participantes = lista_defecto.copy()
-
-# Cargar parejas persistentes
-parejas_guardadas = cargar_parejas()
-
-# Si no hay sorteo guardado → generarlo y guardarlo
-if parejas_guardadas is None:
-    if len(st.session_state.participantes) >= 2:
-        parejas_generadas = generar_parejas(st.session_state.participantes)
-        guardar_parejas(parejas_generadas)
-        st.session_state.parejas = parejas_generadas
-        st.success("🎉 Sorteo generado automáticamente y guardado permanentemente.")
-else:
-    st.session_state.parejas = parejas_guardadas
-    st.info("🔒 Sorteo cargado desde memoria. No cambiará.")
-
-# ===============================
-# CONSULTAR RESULTADO INDIVIDUAL
-# ===============================
-st.write("---")
-st.subheader("👤 Ver tu participante")
-
-nombre = st.text_input("Escribe tu nombre:")
-
-if st.button("Ver mi resultado"):
-    if nombre in st.session_state.parejas:
-        asignado = st.session_state.parejas[nombre]
-        st.success(f"🎁 **{nombre}**, tu participante secreto es: **{asignado}** 🎉")
+    if nombre in sorteo:
+        asignado = sorteo[nombre]
+        st.success(f"🎉 Tu participante es: **{asignado}**")
     else:
-        st.error("Ese nombre no está en la lista de participantes.")
+        st.error("Nombre no encontrado. Escríbelo la Primera letra con Mayúscula.")
 
 # ===============================
 # MENSAJE FINAL
 # ===============================
 st.write("---")
 st.info("Este sorteo es permanente. No cambia aunque cierres la app o la recargues.")
-
-
-
