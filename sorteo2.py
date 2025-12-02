@@ -12,17 +12,22 @@ with open("sorteo.json", "r") as f:
 
 nombre = st.text_input("Tu nombre:")
 
-if nombre:
-    nombre = nombre.strip().title()
+# Mostrar botón
+if st.button("🔍 Consultar amigo"):
+    if nombre:
+        nombre = nombre.strip().title()
 
-    if nombre in sorteo:
-        asignado = sorteo[nombre]
-        st.success(f"🎉 Tu participante es: **{asignado}**")
+        if nombre in sorteo:
+            asignado = sorteo[nombre]
+            st.success(f"🎉 Tu participante asignado es: **{asignado}**")
+        else:
+            st.error("❌ Nombre no encontrado. Escríbelo exactamente como está en la lista.")
     else:
-        st.error("Nombre no encontrado. Escríbelo la Primera letra con Mayúscula.")
+        st.warning("⚠️ Primero escribe tu nombre antes de consultar.")
 
 # ===============================
 # MENSAJE FINAL
 # ===============================
 st.write("---")
 st.info("Este sorteo es permanente. No cambia aunque cierres la app o la recargues.")
+
